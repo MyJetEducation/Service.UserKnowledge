@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Threading.Tasks;
 using Service.Core.Domain.Extensions;
+using Service.Core.Domain.Models.Constants;
 using Service.Core.Grpc.Models;
 using Service.ServerKeyValue.Grpc;
 using Service.ServerKeyValue.Grpc.Models;
@@ -31,7 +32,7 @@ namespace Service.UserKnowledge.Services
 
 			string level = getResponse.Items?.FirstOrDefault(model => model.Key == KeyKnowledgeLevel)?.Value;
 			if (!level.IsNullOrWhiteSpace() && int.TryParse(level, out int intLevel))
-				result.Level = (KnowledgeLevel) intLevel;
+				result.Level = (Tutorial) intLevel;
 
 			return result;
 		}

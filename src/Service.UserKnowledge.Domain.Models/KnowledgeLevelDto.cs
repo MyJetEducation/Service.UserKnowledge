@@ -1,9 +1,11 @@
-﻿namespace Service.UserKnowledge.Domain.Models
+﻿using Service.Core.Domain.Models.Constants;
+
+namespace Service.UserKnowledge.Domain.Models
 {
 	public class KnowledgeLevelDto
 	{
-		public KnowledgeLevelDto(KnowledgeLevel level) => Level = level;
+		public KnowledgeLevelDto(Tutorial level) => Level = level;
 
-		public KnowledgeLevel Level { get; set; }
+		public Tutorial Level { get; set; }
 	}
 }
