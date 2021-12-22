@@ -12,6 +12,6 @@ namespace Service.UserKnowledge.Grpc
 		ValueTask<KnowledgeLevelGrpcResponse> GetKnowledgeLevelAsync(GetKnowledgeLevelGrpcRequset request);
 
 		[OperationContract]
-		ValueTask<CommonGrpcResponse> SetKnowledgeLevel(SetKnowledgeLevelGrpcRequset request);
+		ValueTask<CommonGrpcResponse> SetKnowledgeLevelAsync(SetKnowledgeLevelGrpcRequset request);
 	}
 }

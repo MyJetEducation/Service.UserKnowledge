@@ -36,7 +36,7 @@ namespace Service.UserKnowledge.Services
 			return result;
 		}
 
-		public async ValueTask<CommonGrpcResponse> SetKnowledgeLevel(SetKnowledgeLevelGrpcRequset request)
+		public async ValueTask<CommonGrpcResponse> SetKnowledgeLevelAsync(SetKnowledgeLevelGrpcRequset request)
 		{
 			var putRequest = new ItemsPutGrpcRequest
 			{
