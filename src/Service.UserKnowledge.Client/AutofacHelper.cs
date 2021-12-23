@@ -11,7 +11,7 @@ namespace Service.UserKnowledge.Client
         {
             var factory = new UserKnowledgeClientFactory(grpcServiceUrl);
 
-            builder.RegisterInstance(factory.GetHelloService()).As<IUserKnowledgeService>().SingleInstance();
+            builder.RegisterInstance(factory.GetUserKnowledgeService()).As<IUserKnowledgeService>().SingleInstance();
         }
     }
 }

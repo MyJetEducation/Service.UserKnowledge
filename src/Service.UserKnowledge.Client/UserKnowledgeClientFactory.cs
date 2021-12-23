@@ -11,6 +11,6 @@ namespace Service.UserKnowledge.Client
         {
         }
 
-        public IUserKnowledgeService GetHelloService() => CreateGrpcService<IUserKnowledgeService>();
+        public IUserKnowledgeService GetUserKnowledgeService() => CreateGrpcService<IUserKnowledgeService>();
     }
 }

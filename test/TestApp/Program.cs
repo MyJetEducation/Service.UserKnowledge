@@ -16,7 +16,7 @@ namespace TestApp
             Console.ReadLine();
 
             var factory = new UserKnowledgeClientFactory("http://localhost:5001");
-            var client = factory.GetHelloService();
+            var client = factory.GetUserKnowledgeService();
 
             Console.WriteLine("End");
             Console.ReadLine();
