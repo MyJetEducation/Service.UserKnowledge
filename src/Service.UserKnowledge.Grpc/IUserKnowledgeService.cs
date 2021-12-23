@@ -9,9 +9,12 @@ namespace Service.UserKnowledge.Grpc
 	public interface IUserKnowledgeService
 	{
 		[OperationContract]
-		ValueTask<KnowledgeLevelGrpcResponse> GetKnowledgeLevelAsync(GetKnowledgeLevelGrpcRequset request);
+		ValueTask<KnowledgeGrpcResponse> GetKnowledgeAsync(GetKnowledgeGrpcRequset request);
 
 		[OperationContract]
-		ValueTask<CommonGrpcResponse> SetKnowledgeLevelAsync(SetKnowledgeLevelGrpcRequset request);
+		ValueTask<CommonGrpcResponse> SetKnowledgeAsync(SetKnowledgeGrpcRequset request);
+
+		[OperationContract]
+		ValueTask<CommonGrpcResponse> SetKnowledgeValueAsync(SetKnowledgeValueGrpcRequset request);
 	}
 }
