@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Service.Core.Domain.Models.Constants;
+using Service.Core.Domain.Models.Education;
 using Service.Core.Grpc.Models;
 using Service.ServerKeyValue.Grpc;
 using Service.ServerKeyValue.Grpc.Models;
@@ -23,50 +23,47 @@ namespace Service.UserKnowledge.Services
 
 		public async ValueTask<KnowledgeGrpcResponse> GetKnowledgeAsync(GetKnowledgeGrpcRequset request) => new KnowledgeGrpcResponse
 		{
-			Knowledge = (await GetKnowledge(request.UserId))?.ToGrpcModel()
+			Knowledge = (await GetKnowledge(request.UserId)).ToGrpcModel()
 		};
 
 		public async ValueTask<KnowledgeValueGrpcResponse> GetKnowledgeValueAsync(GetKnowledgeValueGrpcRequset request)
 		{
 			var result = new KnowledgeValueGrpcResponse();
 
-			KnowledgeDto? knowledgeDto = await GetKnowledge(request.UserId);
-			if (knowledgeDto == null)
-				return result;
+			KnowledgeDto knowledge = await GetKnowledge(request.UserId);
 
-			KnowledgeDto knowledge = knowledgeDto.Value;
 			int? value = null;
 
 			switch (request.Tutorial)
 			{
-				case Tutorial.PersonalFinance:
+				case EducationTutorial.PersonalFinance:
 					value = knowledge.PersonalFinance;
 					break;
-				case Tutorial.BehavioralFinance:
+				case EducationTutorial.BehavioralFinance:
 					value = knowledge.BehavioralFinance;
 					break;
-				case Tutorial.FinancialServices:
+				case EducationTutorial.FinancialServices:
 					value = knowledge.FinancialServices;
 					break;
-				case Tutorial.FinanceMarkets:
+				case EducationTutorial.FinanceMarkets:
 					value = knowledge.FinanceMarkets;
 					break;
-				case Tutorial.HealthAndFinance:
+				case EducationTutorial.HealthAndFinance:
 					value = knowledge.HealthAndFinance;
 					break;
-				case Tutorial.PsychologyAndFinance:
+				case EducationTutorial.PsychologyAndFinance:
 					value = knowledge.PsychologyAndFinance;
 					break;
-				case Tutorial.FinanceSecurity:
+				case EducationTutorial.FinanceSecurity:
 					value = knowledge.FinanceSecurity;
 					break;
-				case Tutorial.TimeManagement:
+				case EducationTutorial.TimeManagement:
 					value = knowledge.TimeManagement;
 					break;
-				case Tutorial.Economics:
+				case EducationTutorial.Economics:
 					value = knowledge.Economics;
 					break;
-				case Tutorial.None:
+				case EducationTutorial.None:
 					break;
 			}
 
@@ -79,43 +76,40 @@ namespace Service.UserKnowledge.Services
 
 		public async ValueTask<CommonGrpcResponse> SetKnowledgeValueAsync(SetKnowledgeValueGrpcRequset request)
 		{
-			KnowledgeDto? knowledgeDto = await GetKnowledge(request.UserId);
-			if (knowledgeDto == null)
-				return CommonGrpcResponse.Fail;
+			KnowledgeDto knowledge = await GetKnowledge(request.UserId);
 
-			KnowledgeDto knowledge = knowledgeDto.Value;
 			int? value = request.Value;
 
 			switch (request.Tutorial)
 			{
-				case Tutorial.PersonalFinance:
+				case EducationTutorial.PersonalFinance:
 					knowledge.PersonalFinance = value;
 					break;
-				case Tutorial.BehavioralFinance:
+				case EducationTutorial.BehavioralFinance:
 					knowledge.BehavioralFinance = value;
 					break;
-				case Tutorial.FinancialServices:
+				case EducationTutorial.FinancialServices:
 					knowledge.FinancialServices = value;
 					break;
-				case Tutorial.FinanceMarkets:
+				case EducationTutorial.FinanceMarkets:
 					knowledge.FinanceMarkets = value;
 					break;
-				case Tutorial.HealthAndFinance:
+				case EducationTutorial.HealthAndFinance:
 					knowledge.HealthAndFinance = value;
 					break;
-				case Tutorial.PsychologyAndFinance:
+				case EducationTutorial.PsychologyAndFinance:
 					knowledge.PsychologyAndFinance = value;
 					break;
-				case Tutorial.FinanceSecurity:
+				case EducationTutorial.FinanceSecurity:
 					knowledge.FinanceSecurity = value;
 					break;
-				case Tutorial.TimeManagement:
+				case EducationTutorial.TimeManagement:
 					knowledge.TimeManagement = value;
 					break;
-				case Tutorial.Economics:
+				case EducationTutorial.Economics:
 					knowledge.Economics = value;
 					break;
-				case Tutorial.None:
+				case EducationTutorial.None:
 				default:
 					throw new ArgumentOutOfRangeException();
 			}
@@ -123,7 +117,7 @@ namespace Service.UserKnowledge.Services
 			return await SetKnowledge(request.UserId, knowledge);
 		}
 
-		private async ValueTask<KnowledgeDto?> GetKnowledge(Guid? userId)
+		private async ValueTask<KnowledgeDto> GetKnowledge(Guid? userId)
 		{
 			ItemsGrpcResponse getResponse = await _serverKeyValueService.Get(new ItemsGetGrpcRequest
 			{
@@ -132,10 +126,10 @@ namespace Service.UserKnowledge.Services
 			});
 
 			string value = getResponse.Items?.FirstOrDefault(model => model.Key == KeyKnowledgeLevel)?.Value;
-			
-			return value != null 
-				? JsonSerializer.Deserialize<KnowledgeDto>(value) 
-				: await ValueTask.FromResult<KnowledgeDto?>(null);
+
+			return value == null
+				? new KnowledgeDto()
+				: JsonSerializer.Deserialize<KnowledgeDto>(value);
 		}
 
 		private async Task<CommonGrpcResponse> SetKnowledge(Guid? userId, KnowledgeDto knowledgeDto) => await _serverKeyValueService.Put(new ItemsPutGrpcRequest

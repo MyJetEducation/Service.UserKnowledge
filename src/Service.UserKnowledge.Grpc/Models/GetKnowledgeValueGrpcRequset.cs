@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Service.Core.Domain.Models.Constants;
+using Service.Core.Domain.Models.Education;
 
 namespace Service.UserKnowledge.Grpc.Models
 {
@@ -11,6 +11,6 @@ namespace Service.UserKnowledge.Grpc.Models
 		public Guid? UserId { get; set; }
 
 		[DataMember(Order = 2)]
-		public Tutorial Tutorial { get; set; }
+		public EducationTutorial Tutorial { get; set; }
 	}
 }
