@@ -17,7 +17,7 @@ namespace Service.UserKnowledge.Services
 	{
 		private readonly IServerKeyValueService _serverKeyValueService;
 
-		private static readonly string KeyKnowledgeLevel = Program.Settings.KeyKnowledgeLevel;
+		private static string KeyKnowledgeLevel => Program.ReloadedSettings(model => model.KeyKnowledgeLevel).Invoke();
 
 		public UserKnowledgeService(IServerKeyValueService serverKeyValueService) => _serverKeyValueService = serverKeyValueService;
 
