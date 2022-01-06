@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -9,130 +10,105 @@ using Service.ServerKeyValue.Grpc.Models;
 using Service.UserKnowledge.Domain.Models;
 using Service.UserKnowledge.Grpc;
 using Service.UserKnowledge.Grpc.Models;
-using Service.UserKnowledge.Mappers;
 
 namespace Service.UserKnowledge.Services
 {
 	public class UserKnowledgeService : IUserKnowledgeService
 	{
+		private static readonly EducationTaskType[] AllowedTaskTypes =
+		{
+			EducationTaskType.Text,
+			EducationTaskType.Video
+		};
+
 		private readonly IServerKeyValueService _serverKeyValueService;
 
-		private static string KeyKnowledgeLevel => Program.ReloadedSettings(model => model.KeyKnowledgeLevel).Invoke();
+		private static string KeyKnowledgeLevel => Program.ReloadedSettings(model => model.KeyUserKnowledge).Invoke();
 
 		public UserKnowledgeService(IServerKeyValueService serverKeyValueService) => _serverKeyValueService = serverKeyValueService;
 
-		public async ValueTask<KnowledgeGrpcResponse> GetKnowledgeAsync(GetKnowledgeGrpcRequset request) => new KnowledgeGrpcResponse
+		public async ValueTask<KnowledgeProgressGrpcResponse> GetKnowledgeProgressAsync(GetKnowledgeProgressGrpcRequset request) => new KnowledgeProgressGrpcResponse
 		{
-			Knowledge = (await GetKnowledge(request.UserId)).ToGrpcModel()
+			Progress = await CountProgress(request.UserId, request.Tutorial)
 		};
 
-		public async ValueTask<KnowledgeValueGrpcResponse> GetKnowledgeValueAsync(GetKnowledgeValueGrpcRequset request)
+		public async ValueTask<KnowledgeAllProgressGrpcResponse> GetAllKnowledgeProgressAsync(GetKnowledgeAllProgressGrpcRequset request)
 		{
-			var result = new KnowledgeValueGrpcResponse();
+			Guid? userId = request.UserId;
+			var list = new List<KnowledgeTutorialProgressGrpcModel>();
 
-			KnowledgeDto knowledge = await GetKnowledge(request.UserId);
-
-			int? value = null;
-
-			switch (request.Tutorial)
+			foreach (KeyValuePair<EducationTutorial, EducationStructureTutorial> pair in EducationStructure.Tutorials)
 			{
-				case EducationTutorial.PersonalFinance:
-					value = knowledge.PersonalFinance;
-					break;
-				case EducationTutorial.BehavioralFinance:
-					value = knowledge.BehavioralFinance;
-					break;
-				case EducationTutorial.FinancialServices:
-					value = knowledge.FinancialServices;
-					break;
-				case EducationTutorial.FinanceMarkets:
-					value = knowledge.FinanceMarkets;
-					break;
-				case EducationTutorial.HealthAndFinance:
-					value = knowledge.HealthAndFinance;
-					break;
-				case EducationTutorial.PsychologyAndFinance:
-					value = knowledge.PsychologyAndFinance;
-					break;
-				case EducationTutorial.FinanceSecurity:
-					value = knowledge.FinanceSecurity;
-					break;
-				case EducationTutorial.TimeManagement:
-					value = knowledge.TimeManagement;
-					break;
-				case EducationTutorial.Economics:
-					value = knowledge.Economics;
-					break;
-				case EducationTutorial.None:
-					break;
+				EducationTutorial tutorial = pair.Value.Tutorial;
+
+				list.Add(new KnowledgeTutorialProgressGrpcModel
+				{
+					Tutorial = tutorial,
+					Progress = await CountProgress(userId, tutorial)
+				});
 			}
 
-			result.Value = value;
-
-			return result;
-		}
-
-		public async ValueTask<CommonGrpcResponse> SetKnowledgeAsync(SetKnowledgeGrpcRequset request) => await SetKnowledge(request.UserId, request.Knowledge.ToDto());
-
-		public async ValueTask<CommonGrpcResponse> SetKnowledgeValueAsync(SetKnowledgeValueGrpcRequset request)
-		{
-			KnowledgeDto knowledge = await GetKnowledge(request.UserId);
-
-			int? value = request.Value;
-
-			switch (request.Tutorial)
+			return new KnowledgeAllProgressGrpcResponse
 			{
-				case EducationTutorial.PersonalFinance:
-					knowledge.PersonalFinance = value;
-					break;
-				case EducationTutorial.BehavioralFinance:
-					knowledge.BehavioralFinance = value;
-					break;
-				case EducationTutorial.FinancialServices:
-					knowledge.FinancialServices = value;
-					break;
-				case EducationTutorial.FinanceMarkets:
-					knowledge.FinanceMarkets = value;
-					break;
-				case EducationTutorial.HealthAndFinance:
-					knowledge.HealthAndFinance = value;
-					break;
-				case EducationTutorial.PsychologyAndFinance:
-					knowledge.PsychologyAndFinance = value;
-					break;
-				case EducationTutorial.FinanceSecurity:
-					knowledge.FinanceSecurity = value;
-					break;
-				case EducationTutorial.TimeManagement:
-					knowledge.TimeManagement = value;
-					break;
-				case EducationTutorial.Economics:
-					knowledge.Economics = value;
-					break;
-				case EducationTutorial.None:
-				default:
-					throw new ArgumentOutOfRangeException();
-			}
-
-			return await SetKnowledge(request.UserId, knowledge);
+				Items = list.ToArray()
+			};
 		}
 
-		private async ValueTask<KnowledgeDto> GetKnowledge(Guid? userId)
+		public async ValueTask<CommonGrpcResponse> SetKnowledgeAsync(SetKnowledgeGrpcRequset request)
 		{
-			ItemsGrpcResponse getResponse = await _serverKeyValueService.Get(new ItemsGetGrpcRequest
+			IList<KnowledgeDto> dtos = (await GetKnowledge(request.UserId)).ToList();
+
+			EducationTutorial tutorial = request.Tutorial;
+
+			if (dtos.All(dto => dto.Tutorial != tutorial))
+				dtos.Add(new KnowledgeDto {Tutorial = tutorial, Ids = Array.Empty<string>()});
+
+			KnowledgeDto knowledge = dtos.First(dto => dto.Tutorial == tutorial);
+
+			string newRecordId = GetRecordId(request.Unit, request.Task);
+			if (!GetAllTaskIds(tutorial).Contains(newRecordId))
+				return CommonGrpcResponse.Fail;
+
+			knowledge.Ids = knowledge.Ids.Union(new[] {newRecordId}).Distinct().ToArray();
+
+			return await SetKnowledge(request.UserId, dtos.ToArray());
+		}
+
+		private async ValueTask<int> CountProgress(Guid? userId, EducationTutorial tutorial)
+		{
+			KnowledgeDto[] dtos = await GetKnowledge(userId);
+
+			KnowledgeDto knowledge = dtos.FirstOrDefault(dto => dto.Tutorial == tutorial);
+			if (knowledge == null)
+				return 0;
+
+			string[] allIds = GetAllTaskIds(tutorial);
+
+			return (int) Math.Round(knowledge.Ids.Length * 100 / (float) allIds.Length);
+		}
+
+		private static string[] GetAllTaskIds(EducationTutorial tutorial) => EducationStructure.Tutorials[tutorial].Units
+			.SelectMany(unit => unit.Value.Tasks
+				.Where(task => AllowedTaskTypes.Contains(task.Value.TaskType))
+				.Select(task => GetRecordId(unit.Value.Unit, task.Value.Task)))
+			.ToArray();
+
+		private static string GetRecordId(int unit, int task) => $"{unit}-{task}";
+
+		private async ValueTask<KnowledgeDto[]> GetKnowledge(Guid? userId)
+		{
+			string value = (await _serverKeyValueService.GetSingle(new ItemsGetSingleGrpcRequest
 			{
 				UserId = userId,
-				Keys = new[] {KeyKnowledgeLevel}
-			});
-
-			string value = getResponse.Items?.FirstOrDefault(model => model.Key == KeyKnowledgeLevel)?.Value;
+				Key = KeyKnowledgeLevel
+			}))?.Value;
 
 			return value == null
-				? new KnowledgeDto()
-				: JsonSerializer.Deserialize<KnowledgeDto>(value);
+				? Array.Empty<KnowledgeDto>()
+				: JsonSerializer.Deserialize<KnowledgeDto[]>(value);
 		}
 
-		private async Task<CommonGrpcResponse> SetKnowledge(Guid? userId, KnowledgeDto knowledgeDto) => await _serverKeyValueService.Put(new ItemsPutGrpcRequest
+		private async ValueTask<CommonGrpcResponse> SetKnowledge(Guid? userId, KnowledgeDto[] knowledgeDtos) => await _serverKeyValueService.Put(new ItemsPutGrpcRequest
 		{
 			UserId = userId,
 			Items = new[]
@@ -140,7 +116,7 @@ namespace Service.UserKnowledge.Services
 				new KeyValueGrpcModel
 				{
 					Key = KeyKnowledgeLevel,
-					Value = JsonSerializer.Serialize(knowledgeDto)
+					Value = JsonSerializer.Serialize(knowledgeDtos)
 				}
 			}
 		});

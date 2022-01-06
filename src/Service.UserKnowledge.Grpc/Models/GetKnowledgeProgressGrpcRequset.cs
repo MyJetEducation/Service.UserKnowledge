@@ -5,7 +5,7 @@ using Service.Core.Domain.Models.Education;
 namespace Service.UserKnowledge.Grpc.Models
 {
 	[DataContract]
-	public class GetKnowledgeValueGrpcRequset
+	public class GetKnowledgeProgressGrpcRequset
 	{
 		[DataMember(Order = 1)]
 		public Guid? UserId { get; set; }

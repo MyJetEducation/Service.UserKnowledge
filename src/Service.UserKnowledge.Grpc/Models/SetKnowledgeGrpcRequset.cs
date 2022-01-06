@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Service.Core.Domain.Models.Education;
 
 namespace Service.UserKnowledge.Grpc.Models
 {
@@ -10,6 +11,12 @@ namespace Service.UserKnowledge.Grpc.Models
 		public Guid? UserId { get; set; }
 
 		[DataMember(Order = 2)]
-		public KnowledgeGrpcModel Knowledge { get; set; }
+		public EducationTutorial Tutorial { get; set; }
+
+		[DataMember(Order = 3)]
+		public int Unit { get; set; }
+
+		[DataMember(Order = 4)]
+		public int Task { get; set; }
 	}
 }

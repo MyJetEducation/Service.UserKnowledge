@@ -17,7 +17,7 @@ namespace Service.UserKnowledge.Settings
         [YamlProperty("UserKnowledge.ServerKeyValueServiceUrl")]
         public string ServerKeyValueServiceUrl { get; set; }
 
-        [YamlProperty("UserKnowledge.KeyKnowledgeLevel")]
-        public string KeyKnowledgeLevel { get; set; }
+        [YamlProperty("UserKnowledge.KeyUserKnowledge")]
+        public string KeyUserKnowledge { get; set; }
     }
 }

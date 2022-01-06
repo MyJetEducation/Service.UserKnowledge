@@ -3,9 +3,9 @@
 namespace Service.UserKnowledge.Grpc.Models
 {
 	[DataContract]
-	public class KnowledgeValueGrpcResponse
+	public class KnowledgeProgressGrpcResponse
 	{
 		[DataMember(Order = 1)]
-		public int? Value { get; set; }
+		public int Progress { get; set; }
 	}
 }
