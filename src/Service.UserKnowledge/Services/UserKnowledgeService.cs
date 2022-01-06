@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Service.Core.Domain.Models.Education;
 using Service.Core.Grpc.Models;
 using Service.ServerKeyValue.Grpc;
@@ -22,10 +23,15 @@ namespace Service.UserKnowledge.Services
 		};
 
 		private readonly IServerKeyValueService _serverKeyValueService;
+		private readonly ILogger<UserKnowledgeService> _logger;
 
 		private static string KeyKnowledgeLevel => Program.ReloadedSettings(model => model.KeyUserKnowledge).Invoke();
 
-		public UserKnowledgeService(IServerKeyValueService serverKeyValueService) => _serverKeyValueService = serverKeyValueService;
+		public UserKnowledgeService(IServerKeyValueService serverKeyValueService, ILogger<UserKnowledgeService> logger)
+		{
+			_serverKeyValueService = serverKeyValueService;
+			_logger = logger;
+		}
 
 		public async ValueTask<KnowledgeProgressGrpcResponse> GetKnowledgeProgressAsync(GetKnowledgeProgressGrpcRequset request) => new KnowledgeProgressGrpcResponse
 		{
@@ -56,20 +62,26 @@ namespace Service.UserKnowledge.Services
 
 		public async ValueTask<CommonGrpcResponse> SetKnowledgeAsync(SetKnowledgeGrpcRequset request)
 		{
+			EducationStructureTask structureTask = EducationHelper.GetTask(request.Tutorial, request.Unit, request.Task);
+			if (structureTask == null)
+			{
+				_logger.LogError("Not valid parameters for set knowledge request: {request}", request);
+				return CommonGrpcResponse.Fail;
+			}
+
+			if (!AllowedTaskTypes.Contains(structureTask.TaskType))
+				return CommonGrpcResponse.Success;
+
 			IList<KnowledgeDto> dtos = (await GetKnowledge(request.UserId)).ToList();
 
 			EducationTutorial tutorial = request.Tutorial;
 
 			if (dtos.All(dto => dto.Tutorial != tutorial))
-				dtos.Add(new KnowledgeDto {Tutorial = tutorial, Ids = Array.Empty<string>()});
+				dtos.Add(new KnowledgeDto {Tutorial = tutorial});
 
 			KnowledgeDto knowledge = dtos.First(dto => dto.Tutorial == tutorial);
 
-			string newRecordId = GetRecordId(request.Unit, request.Task);
-			if (!GetAllTaskIds(tutorial).Contains(newRecordId))
-				return CommonGrpcResponse.Fail;
-
-			knowledge.Ids = knowledge.Ids.Union(new[] {newRecordId}).Distinct().ToArray();
+			knowledge.Value++;
 
 			return await SetKnowledge(request.UserId, dtos.ToArray());
 		}
@@ -82,18 +94,17 @@ namespace Service.UserKnowledge.Services
 			if (knowledge == null)
 				return 0;
 
-			string[] allIds = GetAllTaskIds(tutorial);
+			int maxValue = GetTotalAllowedTasks(tutorial);
 
-			return (int) Math.Round(knowledge.Ids.Length * 100 / (float) allIds.Length);
+			return (int) Math.Round(knowledge.Value * 100 / (float) maxValue);
 		}
 
-		private static string[] GetAllTaskIds(EducationTutorial tutorial) => EducationStructure.Tutorials[tutorial].Units
-			.SelectMany(unit => unit.Value.Tasks
-				.Where(task => AllowedTaskTypes.Contains(task.Value.TaskType))
-				.Select(task => GetRecordId(unit.Value.Unit, task.Value.Task)))
-			.ToArray();
-
-		private static string GetRecordId(int unit, int task) => $"{unit}-{task}";
+		private static int GetTotalAllowedTasks(EducationTutorial tutorial) =>
+			EducationStructure.Tutorials[tutorial].Units
+				.SelectMany(unit => unit.Value.Tasks
+					.Where(task => AllowedTaskTypes.Contains(task.Value.TaskType))
+					.Select(task => task.Value.Task))
+				.Count();
 
 		private async ValueTask<KnowledgeDto[]> GetKnowledge(Guid? userId)
 		{

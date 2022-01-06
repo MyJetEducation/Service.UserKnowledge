@@ -6,6 +6,6 @@ namespace Service.UserKnowledge.Domain.Models
 	{
 		public EducationTutorial Tutorial { get; set; }
 
-		public string[] Ids { get; set; }
+		public int Value { get; set; }
 	}
 }
