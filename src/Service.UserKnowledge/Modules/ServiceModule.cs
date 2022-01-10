@@ -5,6 +5,7 @@ using MyServiceBus.TcpClient;
 using Service.EducationProgress.Domain.Models;
 using Service.ServerKeyValue.Client;
 using Service.UserKnowledge.Jobs;
+using Service.UserKnowledge.Services;
 
 namespace Service.UserKnowledge.Modules
 {
@@ -14,15 +15,14 @@ namespace Service.UserKnowledge.Modules
 		{
 			builder.RegisterKeyValueClient(Program.Settings.ServerKeyValueServiceUrl);
 
+			builder.RegisterType<UserKnowledgeService>().AsImplementedInterfaces().SingleInstance();
+
 			MyServiceBusTcpClient serviceBusClient = builder.RegisterMyServiceBusTcpClient(Program.ReloadedSettings(e => e.ServiceBusReader), Program.LogFactory);
 
 			const string queueName = "MyJetEducation-UserKnowledge";
 			builder.RegisterMyServiceBusSubscriberBatch<SetProgressInfoServiceBusModel>(serviceBusClient, SetProgressInfoServiceBusModel.TopicName, queueName, TopicQueueType.Permanent);
 
-			builder
-				.RegisterType<SetProgressInfoNotificator>()
-				.AutoActivate()
-				.SingleInstance();
+			builder.RegisterType<SetProgressInfoNotificator>().AutoActivate().SingleInstance();
 		}
 	}
 }
