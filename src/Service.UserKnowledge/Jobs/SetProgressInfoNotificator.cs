@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotNetCoreDecorators;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Service.EducationProgress.Domain.Models;
 using Service.UserKnowledge.Grpc;
 using Service.UserKnowledge.Grpc.Models;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Service.UserKnowledge.Jobs
 {
@@ -29,7 +27,7 @@ namespace Service.UserKnowledge.Jobs
 			foreach (SetProgressInfoServiceBusModel message in events)
 			{
 				Guid? user = message.UserId;
-				_logger.LogInformation($"SetProgressInfoServiceBusModel handled from service bus: {JsonSerializer.Serialize(message)}");
+				_logger.LogInformation("SetProgressInfoServiceBusModel handled from service bus: {user}", user);
 
 				await _userKnowledgeService.SetKnowledgeAsync(new SetKnowledgeGrpcRequset
 				{
