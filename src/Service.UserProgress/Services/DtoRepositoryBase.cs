@@ -1,0 +1,93 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Service.Core.Domain.Models.Education;
+using Service.ServerKeyValue.Grpc;
+using Service.ServerKeyValue.Grpc.Models;
+using Service.UserProgress.Domain.Models;
+
+namespace Service.UserProgress.Services
+{
+	public abstract class DtoRepositoryBase : IDtoRepository
+	{
+		private readonly Func<string> _settingsKeyFunc;
+		private readonly IServerKeyValueService _serverKeyValueService;
+
+		protected DtoRepositoryBase(Func<string> settingsKeyFunc, IServerKeyValueService serverKeyValueService)
+		{
+			_settingsKeyFunc = settingsKeyFunc;
+			_serverKeyValueService = serverKeyValueService;
+		}
+
+		protected abstract EducationTaskType[] AllowedTaskTypes { get; }
+
+		public async ValueTask<ProgressDto> GetData(Guid? userId)
+		{
+			ProgressDto[] dtos = await GetDataAll(userId);
+
+			ProgressDto progressDto = dtos
+				.OrderByDescending(dto => dto.Tutorial)
+				.FirstOrDefault(dto => dto.Progress >= 80);
+
+			return progressDto ?? new ProgressDto();
+		}
+
+		public async ValueTask<ProgressDto[]> GetDataAll(Guid? userId)
+		{
+			string value = (await _serverKeyValueService.GetSingle(new ItemsGetSingleGrpcRequest
+			{
+				UserId = userId,
+				Key = _settingsKeyFunc.Invoke()
+			}))?.Value;
+
+			return value == null
+				? Array.Empty<ProgressDto>()
+				: JsonSerializer.Deserialize<ProgressDto[]>(value);
+		}
+
+		public async ValueTask SetData(Guid? userId, EducationTutorial tutorial, int unit, int task)
+		{
+			EducationStructureTask structureTask = EducationHelper.GetTask(tutorial, unit, task);
+			if (!AllowedTaskTypes.Contains(structureTask.TaskType))
+				return;
+
+			List<ProgressDto> dtos = (await GetDataAll(userId)).ToList();
+
+			ProgressDto progressDto = dtos.FirstOrDefault(dto => dto.Tutorial == tutorial);
+			if (progressDto == null)
+			{
+				progressDto = new ProgressDto {Tutorial = tutorial};
+				dtos.Add(progressDto);
+			}
+
+			progressDto.TaskCount++;
+			CountProgress(progressDto);
+
+			await SetData(userId, dtos.ToArray());
+		}
+
+		private async ValueTask SetData(Guid? userId, ProgressDto[] dtos) => await _serverKeyValueService.Put(new ItemsPutGrpcRequest
+		{
+			UserId = userId,
+			Items = new[]
+			{
+				new KeyValueGrpcModel
+				{
+					Key = _settingsKeyFunc.Invoke(),
+					Value = JsonSerializer.Serialize(dtos)
+				}
+			}
+		});
+
+		private void CountProgress(ProgressDto dto)
+		{
+			int totalCount = EducationStructure.Tutorials[dto.Tutorial].Units
+				.SelectMany(pair => pair.Value.Tasks)
+				.Count(task => AllowedTaskTypes.Contains(task.Value.TaskType));
+
+			dto.Progress = (int) Math.Round(dto.TaskCount * 100 / (float) totalCount);
+		}
+	}
+}

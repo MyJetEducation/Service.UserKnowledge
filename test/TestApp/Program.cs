@@ -1,25 +1,25 @@
 ﻿using System;
 using System.Threading.Tasks;
 using ProtoBuf.Grpc.Client;
-using Service.UserKnowledge.Client;
-using Service.UserKnowledge.Grpc.Models;
+using Service.UserProgress.Client;
+using Service.UserProgress.Grpc;
 
 namespace TestApp
 {
-    public class Program
-    {
-        static async Task Main(string[] args)
-        {
-            GrpcClientFactory.AllowUnencryptedHttp2 = true;
+	public class Program
+	{
+		private static async Task Main(string[] args)
+		{
+			GrpcClientFactory.AllowUnencryptedHttp2 = true;
 
-            Console.Write("Press enter to start");
-            Console.ReadLine();
+			Console.Write("Press enter to start");
+			Console.ReadLine();
 
-            var factory = new UserKnowledgeClientFactory("http://localhost:5001");
-            var client = factory.GetUserKnowledgeService();
+			var factory = new UserProgressClientFactory("http://localhost:5001");
+			IUserProgressService client = factory.GetUserProgressService();
 
-            Console.WriteLine("End");
-            Console.ReadLine();
-        }
-    }
+			Console.WriteLine("End");
+			Console.ReadLine();
+		}
+	}
 }

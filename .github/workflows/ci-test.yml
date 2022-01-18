@@ -32,7 +32,7 @@ jobs:
       run: ls
 
     - name: Publish Service
-      run: dotnet publish --no-build ./src/Service.UserKnowledge/Service.UserKnowledge.csproj --configuration Release --output ./publish-api
+      run: dotnet publish --no-build ./src/Service.UserProgress/Service.UserProgress.csproj --configuration Release --output ./publish-api
 
     - name: Check Service dir
       run: ls ./publish-api
@@ -45,9 +45,9 @@ jobs:
         path: ./publish-api
 #        registry: docker.pkg.github.com
         registry: ghcr.io
-        repository: ${{ secrets.ORG_NAME }}/service.userknowledge/service.userknowledge-test
+        repository: ${{ secrets.ORG_NAME }}/service.userprogress/service.userprogress-test
         tags: latest
-        build_args: app_version=service.userknowledge-test:latest,app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
+        build_args: app_version=service.userprogress-test:latest,app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
 
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@master
@@ -56,7 +56,7 @@ jobs:
         username: ${{ secrets.USERNAME }}
         port: ${{ secrets.PORT }}
         key: ${{ secrets.PRIVATE_KEY }}
-        script: cd /home/monfex/Services/Service.UserKnowledge && docker-compose pull && docker-compose up -d
+        script: cd /home/monfex/Services/Service.UserProgress && docker-compose pull && docker-compose up -d
 
 #    - name: Publish image Azure
 #      uses: docker/build-push-action@v1

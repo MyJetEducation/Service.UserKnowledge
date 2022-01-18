@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Service.UserKnowledge.Client\Service.UserKnowledge.Client.csproj" />
-    <ProjectReference Include="..\..\src\Service.UserKnowledge.Grpc\Service.UserKnowledge.Grpc.csproj" />
+    <ProjectReference Include="..\..\src\Service.UserProgress.Client\Service.UserProgress.Client.csproj" />
+    <ProjectReference Include="..\..\src\Service.UserProgress.Grpc\Service.UserProgress.Grpc.csproj" />
   </ItemGroup>
 
 </Project>

@@ -32,7 +32,7 @@ jobs:
       run: ls
 
     - name: Publish Service
-      run: dotnet publish ./src/Service.UserKnowledge/Service.UserKnowledge.csproj --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/} --output ./publish-api
+      run: dotnet publish ./src/Service.UserProgress/Service.UserProgress.csproj --configuration Release /p:AssemblyVersion=${GITHUB_REF#refs/tags/} --output ./publish-api
 
     - name: Check Service dir
       run: ls ./publish-api
@@ -50,9 +50,9 @@ jobs:
         path: ./publish-api
 #        registry: docker.pkg.github.com
         registry: ghcr.io
-        repository: ${{ secrets.ORG_NAME }}/service.userknowledge/service.userknowledge
+        repository: ${{ secrets.ORG_NAME }}/service.userprogress/service.userprogress
         tag_with_ref: true
-        build_args: app_version=service.userknowledge:${{ steps.extract_branch.outputs.branch }},app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
+        build_args: app_version=service.userprogress:${{ steps.extract_branch.outputs.branch }},app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
 
 #    - name: Publish image Azure
 #      uses: docker/build-push-action@v1
