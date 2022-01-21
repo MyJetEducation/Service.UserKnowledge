@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Autofac;
+using DotNetCoreDecorators;
 using MyJetWallet.Sdk.ServiceBus;
 using MyServiceBus.Abstractions;
 using MyServiceBus.TcpClient;
@@ -38,6 +39,11 @@ namespace Service.UserProgress.Modules
 					c.Resolve<SkillProgressService>()
 				})
 				.As<IEnumerable<IDtoRepository>>();
+
+			var tcpServiceBus = new MyServiceBusTcpClient(() => Program.Settings.ServiceBusWriter, "MyJetEducation Service.UserProgress");
+			IPublisher<UserProgressUpdatedServiceBusModel> clientRegisterPublisher = new MyServiceBusPublisher(tcpServiceBus);
+			builder.Register(context => clientRegisterPublisher);
+			tcpServiceBus.Start();
 		}
 	}
 }

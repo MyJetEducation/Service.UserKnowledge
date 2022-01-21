@@ -20,6 +20,9 @@ namespace Service.UserProgress.Settings
 		[YamlProperty("UserProgress.ServiceBusReader")]
 		public string ServiceBusReader { get; set; }
 
+		[YamlProperty("UserProgress.ServiceBusWriter")]
+		public string ServiceBusWriter { get; set; }
+
 		[YamlProperty("UserProgress.KeyUserKnowledge")]
 		public string KeyUserKnowledge { get; set; }
 

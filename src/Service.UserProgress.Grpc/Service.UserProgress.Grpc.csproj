@@ -5,16 +5,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\Knowledge\**" />
+    <EmbeddedResource Remove="Models\Knowledge\**" />
+    <None Remove="Models\Knowledge\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MyJetEducation.Service.Core.Client" Version="1.0.14" />
     <PackageReference Include="System.ServiceModel.Primitives" Version="4.9.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Service.UserProgress.Domain.Models\Service.UserProgress.Domain.Models.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\Knowledge\" />
   </ItemGroup>
 
 </Project>

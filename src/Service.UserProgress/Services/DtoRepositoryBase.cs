@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using DotNetCoreDecorators;
+using Microsoft.Extensions.Logging;
 using Service.Core.Domain.Models.Education;
+using Service.Core.Grpc.Models;
 using Service.ServerKeyValue.Grpc;
 using Service.ServerKeyValue.Grpc.Models;
 using Service.UserProgress.Domain.Models;
@@ -14,11 +17,15 @@ namespace Service.UserProgress.Services
 	{
 		private readonly Func<string> _settingsKeyFunc;
 		private readonly IServerKeyValueService _serverKeyValueService;
+		private readonly IPublisher<UserProgressUpdatedServiceBusModel> _publisher;
+		private readonly ILogger _logger;
 
-		protected DtoRepositoryBase(Func<string> settingsKeyFunc, IServerKeyValueService serverKeyValueService)
+		protected DtoRepositoryBase(Func<string> settingsKeyFunc, IServerKeyValueService serverKeyValueService, IPublisher<UserProgressUpdatedServiceBusModel> publisher, ILogger logger)
 		{
 			_settingsKeyFunc = settingsKeyFunc;
 			_serverKeyValueService = serverKeyValueService;
+			_publisher = publisher;
+			_logger = logger;
 		}
 
 		protected abstract EducationTaskType[] AllowedTaskTypes { get; }
@@ -65,10 +72,26 @@ namespace Service.UserProgress.Services
 			progressDto.TaskCount++;
 			CountProgress(progressDto);
 
-			await SetData(userId, dtos.ToArray());
+			CommonGrpcResponse response = await SetData(userId, dtos.ToArray());
+			if (!response.IsSuccess)
+			{
+				_logger.LogError("Error while save user progress for user: {user}, dto: {dto}.", userId, progressDto);
+				return;
+			}
+
+			//Publish for UserReward serice
+			await _publisher.PublishAsync(new UserProgressUpdatedServiceBusModel
+			{
+				UserId = userId,
+				HabitCount = dtos.Count,
+				PersonalTutorialFullFinished = dtos
+					.Where(dto => dto.Tutorial == EducationTutorial.PersonalFinance)
+					.Select(dto => dto.Progress)
+					.FirstOrDefault(0) == 100
+			});
 		}
 
-		private async ValueTask SetData(Guid? userId, ProgressDto[] dtos) => await _serverKeyValueService.Put(new ItemsPutGrpcRequest
+		private async ValueTask<CommonGrpcResponse> SetData(Guid? userId, ProgressDto[] dtos) => await _serverKeyValueService.Put(new ItemsPutGrpcRequest
 		{
 			UserId = userId,
 			Items = new[]
