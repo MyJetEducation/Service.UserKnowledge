@@ -12,15 +12,9 @@ namespace Service.UserProgress.Domain.Models
 		public Guid? UserId { get; set; }
 
 		/// <summary>
-		///     Прошел первую дисциплину на 100%
-		/// </summary>
-		[DataMember(Order = 2)]
-		public bool? PersonalTutorialFullFinished { get; set; }
-
-		/// <summary>
 		///     Кол-во заработанных привычек
 		/// </summary>
-		[DataMember(Order = 3)]
+		[DataMember(Order = 2)]
 		public int HabitCount { get; set; }
 	}
 }

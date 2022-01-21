@@ -83,11 +83,7 @@ namespace Service.UserProgress.Services
 			await _publisher.PublishAsync(new UserProgressUpdatedServiceBusModel
 			{
 				UserId = userId,
-				HabitCount = dtos.Count,
-				PersonalTutorialFullFinished = dtos
-					.Where(dto => dto.Tutorial == EducationTutorial.PersonalFinance)
-					.Select(dto => dto.Progress)
-					.FirstOrDefault(0) == 100
+				HabitCount = dtos.Count
 			});
 		}
 
