@@ -4,7 +4,7 @@ using DotNetCoreDecorators;
 using MyJetWallet.Sdk.ServiceBus;
 using MyServiceBus.Abstractions;
 using MyServiceBus.TcpClient;
-using Service.EducationProgress.Domain.Models;
+using Service.EducationProgress.Grpc.ServiceBusModels;
 using Service.ServerKeyValue.Client;
 using Service.UserProgress.Domain.Models;
 using Service.UserProgress.Jobs;

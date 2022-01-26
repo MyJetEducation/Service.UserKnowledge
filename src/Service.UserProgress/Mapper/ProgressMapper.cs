@@ -1,6 +1,6 @@
 ﻿using System.Linq;
-using Service.UserProgress.Domain.Models;
 using Service.UserProgress.Grpc.Models;
+using Service.UserProgress.Models;
 
 namespace Service.UserProgress.Mapper
 {

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Service.Core.Domain.Models.Education;
+using Service.Core.Client.Education;
+using Service.UserProgress.Models;
 
-namespace Service.UserProgress.Domain.Models
+namespace Service.UserProgress.Services
 {
 	public interface IDtoRepository
 	{

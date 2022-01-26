@@ -5,11 +5,12 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using DotNetCoreDecorators;
 using Microsoft.Extensions.Logging;
-using Service.Core.Domain.Models.Education;
-using Service.Core.Grpc.Models;
+using Service.Core.Client.Education;
+using Service.Core.Client.Models;
 using Service.ServerKeyValue.Grpc;
 using Service.ServerKeyValue.Grpc.Models;
 using Service.UserProgress.Domain.Models;
+using Service.UserProgress.Models;
 
 namespace Service.UserProgress.Services
 {

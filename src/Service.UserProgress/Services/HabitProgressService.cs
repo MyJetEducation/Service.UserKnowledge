@@ -1,6 +1,6 @@
 ﻿using DotNetCoreDecorators;
 using Microsoft.Extensions.Logging;
-using Service.Core.Domain.Models.Education;
+using Service.Core.Client.Education;
 using Service.ServerKeyValue.Grpc;
 using Service.UserProgress.Domain.Models;
 

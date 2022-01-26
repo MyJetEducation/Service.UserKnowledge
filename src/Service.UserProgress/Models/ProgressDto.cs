@@ -1,6 +1,6 @@
-﻿using Service.Core.Domain.Models.Education;
+﻿using Service.Core.Client.Education;
 
-namespace Service.UserProgress.Domain.Models
+namespace Service.UserProgress.Models
 {
 	public class ProgressDto
 	{
