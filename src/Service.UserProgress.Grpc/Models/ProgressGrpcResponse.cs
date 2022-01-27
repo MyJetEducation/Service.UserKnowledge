@@ -10,5 +10,8 @@ namespace Service.UserProgress.Grpc.Models
 
 		[DataMember(Order = 2)]
 		public int Progress { get; set; }
+
+		[DataMember(Order = 3)]
+		public int Count { get; set; }
 	}
 }

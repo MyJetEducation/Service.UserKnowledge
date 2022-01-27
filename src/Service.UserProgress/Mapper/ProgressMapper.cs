@@ -9,7 +9,8 @@ namespace Service.UserProgress.Mapper
 		public static ProgressGrpcResponse ToGrpcModel(this ProgressDto dto) => new ProgressGrpcResponse
 		{
 			Progress = dto.Progress,
-			Index = (int) dto.Tutorial
+			Index = (int) dto.Tutorial,
+			Count = dto.TaskCount
 		};
 
 		public static AllProgressGrpcResponse ToGrpcModel(this ProgressDto[] dtos) => new AllProgressGrpcResponse
