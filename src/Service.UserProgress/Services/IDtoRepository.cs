@@ -7,7 +7,7 @@ namespace Service.UserProgress.Services
 {
 	public interface IDtoRepository
 	{
-		ValueTask<ProgressDto> GetData(Guid? userId);
+		ValueTask<ProgressDto> GetData(Guid? userId, EducationTutorial tutorial);
 
 		ValueTask<ProgressDto[]> GetDataAll(Guid? userId);
 
