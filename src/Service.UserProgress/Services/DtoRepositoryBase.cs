@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using DotNetCoreDecorators;
 using Microsoft.Extensions.Logging;
 using Service.Core.Client.Education;
 using Service.Core.Client.Models;
 using Service.ServerKeyValue.Grpc;
 using Service.ServerKeyValue.Grpc.Models;
-using Service.UserProgress.Domain.Models;
 using Service.UserProgress.Models;
 
 namespace Service.UserProgress.Services
@@ -18,14 +16,12 @@ namespace Service.UserProgress.Services
 	{
 		private readonly Func<string> _settingsKeyFunc;
 		private readonly IServerKeyValueService _serverKeyValueService;
-		private readonly IPublisher<UserProgressUpdatedServiceBusModel> _publisher;
 		private readonly ILogger _logger;
 
-		protected DtoRepositoryBase(Func<string> settingsKeyFunc, IServerKeyValueService serverKeyValueService, IPublisher<UserProgressUpdatedServiceBusModel> publisher, ILogger logger)
+		protected DtoRepositoryBase(Func<string> settingsKeyFunc, IServerKeyValueService serverKeyValueService, ILogger logger)
 		{
 			_settingsKeyFunc = settingsKeyFunc;
 			_serverKeyValueService = serverKeyValueService;
-			_publisher = publisher;
 			_logger = logger;
 		}
 
@@ -80,13 +76,10 @@ namespace Service.UserProgress.Services
 				return;
 			}
 
-			//Publish for UserReward serice
-			await _publisher.PublishAsync(new UserProgressUpdatedServiceBusModel
-			{
-				UserId = userId,
-				HabitCount = dtos.Count
-			});
+			await ProgressSaved(userId, dtos);
 		}
+
+		protected virtual ValueTask ProgressSaved(Guid? userId, IEnumerable<ProgressDto> progressDtos) => ValueTask.CompletedTask;
 
 		private async ValueTask<CommonGrpcResponse> SetData(Guid? userId, ProgressDto[] dtos) => await _serverKeyValueService.Put(new ItemsPutGrpcRequest
 		{
