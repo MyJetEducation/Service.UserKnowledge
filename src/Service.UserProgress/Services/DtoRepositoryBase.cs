@@ -27,11 +27,13 @@ namespace Service.UserProgress.Services
 
 		protected abstract EducationTaskType[] AllowedTaskTypes { get; }
 
-		public async ValueTask<ProgressDto> GetData(Guid? userId, EducationTutorial tutorial)
+		public async ValueTask<ProgressDto> GetData(Guid? userId)
 		{
 			ProgressDto[] dtos = await GetDataAll(userId);
 
-			ProgressDto progressDto = dtos.FirstOrDefault(dto => dto.Tutorial == tutorial);
+			ProgressDto progressDto = dtos
+				.OrderByDescending(dto => dto.Tutorial)
+				.FirstOrDefault();
 
 			return progressDto ?? new ProgressDto();
 		}
