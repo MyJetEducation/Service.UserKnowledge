@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Autofac;
-using DotNetCoreDecorators;
 using MyJetWallet.Sdk.ServiceBus;
 using MyServiceBus.Abstractions;
 using MyServiceBus.TcpClient;
@@ -8,23 +7,18 @@ using Service.ServerKeyValue.Client;
 using Service.ServiceBus.Models;
 using Service.UserProgress.Jobs;
 using Service.UserProgress.Services;
-using SetProgressInfoServiceBusModel = Service.EducationProgress.Grpc.ServiceBusModels.SetProgressInfoServiceBusModel;
 
 namespace Service.UserProgress.Modules
 {
 	public class ServiceModule : Module
 	{
+		private const string QueueName = "MyJetEducation-UserProgress";
+
 		protected override void Load(ContainerBuilder builder)
 		{
 			builder.RegisterKeyValueClient(Program.Settings.ServerKeyValueServiceUrl);
 
 			builder.RegisterType<UserProgressService>().AsImplementedInterfaces().SingleInstance();
-
-			MyServiceBusTcpClient serviceBusClient = builder.RegisterMyServiceBusTcpClient(Program.ReloadedSettings(e => e.ServiceBusReader), Program.LogFactory);
-
-			const string queueName = "MyJetEducation-UserProgress";
-			builder.RegisterMyServiceBusSubscriberBatch<SetProgressInfoServiceBusModel>(serviceBusClient, SetProgressInfoServiceBusModel.TopicName, queueName, TopicQueueType.Permanent);
-
 			builder.RegisterType<SetProgressInfoNotificator>().AutoActivate().SingleInstance();
 
 			builder.RegisterType<KnowledgeProgressService>().AsSelf().SingleInstance();
@@ -40,9 +34,16 @@ namespace Service.UserProgress.Modules
 				})
 				.As<IEnumerable<IDtoRepository>>();
 
+			MyServiceBusTcpClient serviceBusClient = builder.RegisterMyServiceBusTcpClient(Program.ReloadedSettings(e => e.ServiceBusReader), Program.LogFactory);
+			builder.RegisterMyServiceBusSubscriberBatch<SetProgressInfoServiceBusModel>(serviceBusClient, SetProgressInfoServiceBusModel.TopicName, QueueName, TopicQueueType.Permanent);
+
 			var tcpServiceBus = new MyServiceBusTcpClient(() => Program.Settings.ServiceBusWriter, "MyJetEducation Service.UserProgress");
-			IPublisher<UserProgressUpdatedServiceBusModel> clientRegisterPublisher = new MyServiceBusPublisher(tcpServiceBus);
-			builder.Register(context => clientRegisterPublisher);
+
+			builder
+				.Register(context => new MyServiceBusPublisher<UserProgressUpdatedServiceBusModel>(tcpServiceBus, UserProgressUpdatedServiceBusModel.TopicName, false))
+				.As<IServiceBusPublisher<UserProgressUpdatedServiceBusModel>>()
+				.SingleInstance();
+
 			tcpServiceBus.Start();
 		}
 	}

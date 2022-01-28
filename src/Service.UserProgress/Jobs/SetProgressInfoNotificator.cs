@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotNetCoreDecorators;
 using Microsoft.Extensions.Logging;
-using Service.EducationProgress.Grpc.ServiceBusModels;
+using Service.ServiceBus.Models;
 using Service.UserProgress.Services;
 
 namespace Service.UserProgress.Jobs
