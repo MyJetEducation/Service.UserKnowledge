@@ -4,11 +4,11 @@ using DotNetCoreDecorators;
 using MyJetWallet.Sdk.ServiceBus;
 using MyServiceBus.Abstractions;
 using MyServiceBus.TcpClient;
-using Service.EducationProgress.Grpc.ServiceBusModels;
 using Service.ServerKeyValue.Client;
-using Service.UserProgress.Domain.Models;
+using Service.ServiceBus.Models;
 using Service.UserProgress.Jobs;
 using Service.UserProgress.Services;
+using SetProgressInfoServiceBusModel = Service.EducationProgress.Grpc.ServiceBusModels.SetProgressInfoServiceBusModel;
 
 namespace Service.UserProgress.Modules
 {

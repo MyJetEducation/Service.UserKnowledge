@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Service.Core.Client.Education;
 using Service.ServerKeyValue.Grpc;
-using Service.UserProgress.Domain.Models;
+using Service.ServiceBus.Models;
 
 namespace Service.UserProgress.Services
 {

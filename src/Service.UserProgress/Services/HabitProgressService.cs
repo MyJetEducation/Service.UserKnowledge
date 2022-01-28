@@ -6,7 +6,7 @@ using DotNetCoreDecorators;
 using Microsoft.Extensions.Logging;
 using Service.Core.Client.Education;
 using Service.ServerKeyValue.Grpc;
-using Service.UserProgress.Domain.Models;
+using Service.ServiceBus.Models;
 using Service.UserProgress.Models;
 
 namespace Service.UserProgress.Services

@@ -2,7 +2,7 @@
 using DotNetCoreDecorators;
 using MyJetWallet.Sdk.ServiceBus;
 using MyServiceBus.TcpClient;
-using Service.UserProgress.Domain.Models;
+using Service.ServiceBus.Models;
 
 namespace Service.UserProgress.Services
 {
