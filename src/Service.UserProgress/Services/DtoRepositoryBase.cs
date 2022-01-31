@@ -35,7 +35,14 @@ namespace Service.UserProgress.Services
 				.OrderByDescending(dto => dto.Tutorial)
 				.FirstOrDefault();
 
-			return progressDto ?? new ProgressDto();
+			return progressDto == null
+				? new ProgressDto()
+				: new ProgressDto
+				{
+					Progress = progressDto.Progress,
+					Tutorial = progressDto.Tutorial,
+					TaskCount = dtos.Sum(dto => dto.TaskCount)
+				};
 		}
 
 		public async ValueTask<ProgressDto[]> GetDataAll(Guid? userId)
