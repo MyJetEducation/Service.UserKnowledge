@@ -7,7 +7,7 @@ namespace Service.UserProgress.Services
 	public class SkillProgressService : DtoRepositoryBase
 	{
 		public SkillProgressService(IServerKeyValueService serverKeyValueService, ILogger<SkillProgressService> logger)
-			: base(Program.ReloadedSettings(model => model.KeyUserHabit), serverKeyValueService, logger)
+			: base(Program.ReloadedSettings(model => model.KeyUserSkill), serverKeyValueService, logger)
 		{
 		}
 
