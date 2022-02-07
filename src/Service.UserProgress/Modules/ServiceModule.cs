@@ -16,7 +16,7 @@ namespace Service.UserProgress.Modules
 
 		protected override void Load(ContainerBuilder builder)
 		{
-			builder.RegisterKeyValueClient(Program.Settings.ServerKeyValueServiceUrl);
+			builder.RegisterServerKeyValueClient(Program.Settings.ServerKeyValueServiceUrl);
 
 			builder.RegisterType<UserProgressService>().AsImplementedInterfaces().SingleInstance();
 			builder.RegisterType<SetProgressInfoNotificator>().AutoActivate().SingleInstance();
