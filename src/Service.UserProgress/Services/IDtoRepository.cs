@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Service.Core.Client.Education;
+using Service.Education.Structure;
 using Service.UserProgress.Models;
 
 namespace Service.UserProgress.Services

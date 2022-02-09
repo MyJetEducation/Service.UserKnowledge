@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Service.Core.Client.Education;
+using Service.Education.Structure;
 using Service.ServerKeyValue.Grpc;
 
 namespace Service.UserProgress.Services
