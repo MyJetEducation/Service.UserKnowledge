@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.ServiceBus;
 using Service.Education.Constants;
 using Service.Education.Structure;
+using Service.Grpc;
 using Service.ServerKeyValue.Grpc;
 using Service.ServiceBus.Models;
 using Service.UserProgress.Models;
@@ -16,7 +17,7 @@ namespace Service.UserProgress.Services
 	{
 		private readonly IServiceBusPublisher<UserProgressUpdatedServiceBusModel> _publisher;
 
-		public HabitProgressService(IServerKeyValueService serverKeyValueService, IServiceBusPublisher<UserProgressUpdatedServiceBusModel> publisher, ILogger<HabitProgressService> logger)
+		public HabitProgressService(IGrpcServiceProxy<IServerKeyValueService> serverKeyValueService, IServiceBusPublisher<UserProgressUpdatedServiceBusModel> publisher, ILogger<HabitProgressService> logger)
 			: base(Program.ReloadedSettings(model => model.KeyUserHabit), serverKeyValueService, logger) =>
 				_publisher = publisher;
 

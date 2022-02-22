@@ -1,12 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
 using Service.Education.Structure;
+using Service.Grpc;
 using Service.ServerKeyValue.Grpc;
 
 namespace Service.UserProgress.Services
 {
 	public class SkillProgressService : DtoRepositoryBase
 	{
-		public SkillProgressService(IServerKeyValueService serverKeyValueService, ILogger<SkillProgressService> logger)
+		public SkillProgressService(IGrpcServiceProxy<IServerKeyValueService> serverKeyValueService, ILogger<SkillProgressService> logger)
 			: base(Program.ReloadedSettings(model => model.KeyUserSkill), serverKeyValueService, logger)
 		{
 		}

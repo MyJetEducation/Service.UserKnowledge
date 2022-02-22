@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Service.Core.Client.Models;
 using Service.Education.Helpers;
 using Service.Education.Structure;
+using Service.Grpc;
 using Service.ServerKeyValue.Grpc;
 using Service.ServerKeyValue.Grpc.Models;
 using Service.UserProgress.Models;
@@ -16,10 +17,10 @@ namespace Service.UserProgress.Services
 	public abstract class DtoRepositoryBase : IDtoRepository
 	{
 		private readonly Func<string> _settingsKeyFunc;
-		private readonly IServerKeyValueService _serverKeyValueService;
+		private readonly IGrpcServiceProxy<IServerKeyValueService> _serverKeyValueService;
 		private readonly ILogger _logger;
 
-		protected DtoRepositoryBase(Func<string> settingsKeyFunc, IServerKeyValueService serverKeyValueService, ILogger logger)
+		protected DtoRepositoryBase(Func<string> settingsKeyFunc, IGrpcServiceProxy<IServerKeyValueService> serverKeyValueService, ILogger logger)
 		{
 			_settingsKeyFunc = settingsKeyFunc;
 			_serverKeyValueService = serverKeyValueService;
@@ -48,7 +49,7 @@ namespace Service.UserProgress.Services
 
 		public async ValueTask<ProgressDto[]> GetDataAll(Guid? userId)
 		{
-			string value = (await _serverKeyValueService.GetSingle(new ItemsGetSingleGrpcRequest
+			string value = (await _serverKeyValueService.Service.GetSingle(new ItemsGetSingleGrpcRequest
 			{
 				UserId = userId,
 				Key = _settingsKeyFunc.Invoke()
@@ -89,7 +90,7 @@ namespace Service.UserProgress.Services
 
 		protected virtual ValueTask ProgressSaved(Guid? userId, IEnumerable<ProgressDto> progressDtos) => ValueTask.CompletedTask;
 
-		private async ValueTask<CommonGrpcResponse> SetData(Guid? userId, ProgressDto[] dtos) => await _serverKeyValueService.Put(new ItemsPutGrpcRequest
+		private async ValueTask<CommonGrpcResponse> SetData(Guid? userId, ProgressDto[] dtos) => await _serverKeyValueService.TryCall(service => service.Put(new ItemsPutGrpcRequest
 		{
 			UserId = userId,
 			Items = new[]
@@ -100,7 +101,7 @@ namespace Service.UserProgress.Services
 					Value = JsonSerializer.Serialize(dtos)
 				}
 			}
-		});
+		}));
 
 		private void CountProgress(ProgressDto dto)
 		{
