@@ -85,8 +85,10 @@ namespace Service.UserProgress.Services
 				return;
 			}
 
-			await SetData(userId, dtos.ToArray());
+			await ProgressSaved(userId, dtos);
 		}
+
+		protected virtual ValueTask ProgressSaved(Guid? userId, IEnumerable<ProgressDto> progressDtos) => ValueTask.CompletedTask;
 
 		private async ValueTask<CommonGrpcResponse> SetData(Guid? userId, ProgressDto[] dtos) => await _serverKeyValueService.TryCall(service => service.Put(new ItemsPutGrpcRequest
 		{
