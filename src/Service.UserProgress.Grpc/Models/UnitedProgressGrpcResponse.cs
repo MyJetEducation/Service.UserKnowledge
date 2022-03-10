@@ -12,6 +12,6 @@ namespace Service.UserProgress.Grpc.Models
 		public ProgressGrpcResponse Habit { get; set; }
 
 		[DataMember(Order = 3)]
-		public ProgressGrpcResponse Skill { get; set; }
+		public SkillProgressGrpcResponse Skill { get; set; }
 	}
 }

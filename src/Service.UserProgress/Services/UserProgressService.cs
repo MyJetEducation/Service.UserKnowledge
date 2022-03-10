@@ -9,15 +9,14 @@ namespace Service.UserProgress.Services
 	{
 		private readonly KnowledgeProgressService _knowledgeRepository;
 		private readonly HabitProgressService _habitRepository;
-		private readonly SkillProgressService _skillRepository;
+		private readonly ISkillProgressService _skillProgressService;
 
 		public UserProgressService(KnowledgeProgressService knowledgeRepository,
-			HabitProgressService habitRepository,
-			SkillProgressService skillRepository)
+			HabitProgressService habitRepository, ISkillProgressService skillProgressService)
 		{
 			_knowledgeRepository = knowledgeRepository;
 			_habitRepository = habitRepository;
-			_skillRepository = skillRepository;
+			_skillProgressService = skillProgressService;
 		}
 
 		public async ValueTask<UnitedProgressGrpcResponse> GetUnitedProgressAsync(GetProgressGrpcRequset request) => new UnitedProgressGrpcResponse
@@ -39,10 +38,7 @@ namespace Service.UserProgress.Services
 		public async ValueTask<AllProgressGrpcResponse> GetAllHabitProgressAsync(GetAllProgressGrpcRequset request) =>
 			(await _habitRepository.GetDataAll(request.UserId)).ToGrpcModel();
 
-		public async ValueTask<ProgressGrpcResponse> GetSkillProgressAsync(GetProgressGrpcRequset request) =>
-			(await _skillRepository.GetData(request.UserId)).ToGrpcModel();
-
-		public async ValueTask<AllProgressGrpcResponse> GetAllSkillProgressAsync(GetAllProgressGrpcRequset request) =>
-			(await _skillRepository.GetDataAll(request.UserId)).ToGrpcModel();
+		public async ValueTask<SkillProgressGrpcResponse> GetSkillProgressAsync(GetProgressGrpcRequset request) =>
+			(await _skillProgressService.GetData(request.UserId)).ToGrpcModel();
 	}
 }

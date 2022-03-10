@@ -33,10 +33,7 @@ namespace Service.UserProgress.Grpc
 		#region Skill
 
 		[OperationContract]
-		ValueTask<ProgressGrpcResponse> GetSkillProgressAsync(GetProgressGrpcRequset request);
-
-		[OperationContract]
-		ValueTask<AllProgressGrpcResponse> GetAllSkillProgressAsync(GetAllProgressGrpcRequset request);
+		ValueTask<SkillProgressGrpcResponse> GetSkillProgressAsync(GetProgressGrpcRequset request);
 
 		#endregion
 	}

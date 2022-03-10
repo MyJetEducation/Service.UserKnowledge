@@ -14,13 +14,13 @@ using Service.UserProgress.Models;
 
 namespace Service.UserProgress.Services
 {
-	public abstract class DtoRepositoryBase : IDtoRepository
+	public abstract class ProgressDtoRepositoryBase : IProgressDtoRepository
 	{
 		private readonly Func<string> _settingsKeyFunc;
 		private readonly IGrpcServiceProxy<IServerKeyValueService> _serverKeyValueService;
 		private readonly ILogger _logger;
 
-		protected DtoRepositoryBase(Func<string> settingsKeyFunc, IGrpcServiceProxy<IServerKeyValueService> serverKeyValueService, ILogger logger)
+		protected ProgressDtoRepositoryBase(Func<string> settingsKeyFunc, IGrpcServiceProxy<IServerKeyValueService> serverKeyValueService, ILogger logger)
 		{
 			_settingsKeyFunc = settingsKeyFunc;
 			_serverKeyValueService = serverKeyValueService;

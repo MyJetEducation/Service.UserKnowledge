@@ -24,16 +24,15 @@ namespace Service.UserProgress.Modules
 
 			builder.RegisterType<KnowledgeProgressService>().AsSelf().SingleInstance();
 			builder.RegisterType<HabitProgressService>().AsSelf().SingleInstance();
-			builder.RegisterType<SkillProgressService>().AsSelf().SingleInstance();
+			builder.RegisterType<SkillProgressService>().AsImplementedInterfaces().SingleInstance();
 
 			builder
-				.Register(c => new List<IDtoRepository>
+				.Register(c => new List<IProgressDtoRepository>
 				{
 					c.Resolve<KnowledgeProgressService>(),
-					c.Resolve<HabitProgressService>(),
-					c.Resolve<SkillProgressService>()
+					c.Resolve<HabitProgressService>()
 				})
-				.As<IEnumerable<IDtoRepository>>();
+				.As<IEnumerable<IProgressDtoRepository>>();
 
 			MyServiceBusTcpClient serviceBusClient = builder.RegisterMyServiceBusTcpClient(Program.ReloadedSettings(e => e.ServiceBusReader), Program.LogFactory);
 			builder.RegisterMyServiceBusSubscriberBatch<SetProgressInfoServiceBusModel>(serviceBusClient, SetProgressInfoServiceBusModel.TopicName, QueueName, TopicQueueType.Permanent);

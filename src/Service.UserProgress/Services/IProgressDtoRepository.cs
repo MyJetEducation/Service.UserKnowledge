@@ -5,7 +5,7 @@ using Service.UserProgress.Models;
 
 namespace Service.UserProgress.Services
 {
-	public interface IDtoRepository
+	public interface IProgressDtoRepository
 	{
 		ValueTask<ProgressDto> GetData(Guid? userId);
 

@@ -13,7 +13,7 @@ using Service.UserProgress.Models;
 
 namespace Service.UserProgress.Services
 {
-	public class HabitProgressService : DtoRepositoryBase
+	public class HabitProgressService : ProgressDtoRepositoryBase
 	{
 		private readonly IServiceBusPublisher<UserProgressUpdatedServiceBusModel> _publisher;
 

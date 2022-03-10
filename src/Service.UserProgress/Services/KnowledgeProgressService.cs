@@ -5,7 +5,7 @@ using Service.ServerKeyValue.Grpc;
 
 namespace Service.UserProgress.Services
 {
-	public class KnowledgeProgressService : DtoRepositoryBase
+	public class KnowledgeProgressService : ProgressDtoRepositoryBase
 	{
 		public KnowledgeProgressService(IGrpcServiceProxy<IServerKeyValueService> serverKeyValueService, ILogger<KnowledgeProgressService> logger)
 			: base(Program.ReloadedSettings(model => model.KeyUserKnowledge), serverKeyValueService, logger)
