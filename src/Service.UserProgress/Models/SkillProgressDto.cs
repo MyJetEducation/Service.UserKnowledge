@@ -1,22 +1,40 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace Service.UserProgress.Models
 {
 	public class SkillProgressDto
 	{
-		public int ConcentrationCount { get; set; }
+		public SkillProgressDto()
+		{
+			ConcentrationProgress = new List<int>();
+			PerseveranceProgress = new List<int>();
+			ThoughtfulnessProgress = new List<int>();
+			MemoryProgress = new List<int>();
+			AdaptabilityProgress = new List<int>();
+			ActivityProgress = new List<int>();
+		}
 
-		public int PerseveranceCount { get; set; }
+		public List<int> ConcentrationProgress { get; set; }
 
-		public int ThoughtfulnessCount { get; set; }
+		public List<int> PerseveranceProgress { get; set; }
 
-		public int MemoryCount { get; set; }
+		public List<int> ThoughtfulnessProgress { get; set; }
 
-		public int AdaptabilityCount { get; set; }
+		public List<int> MemoryProgress { get; set; }
 
-		public int ActivityCount { get; set; }
+		public List<int> AdaptabilityProgress { get; set; }
+
+		public List<int> ActivityProgress { get; set; }
 
 		[JsonIgnore]
-		public int TotalCount => ConcentrationCount + PerseveranceCount + ThoughtfulnessCount + MemoryCount + AdaptabilityCount + ActivityCount;
+		public int[] TotalProgress => ConcentrationProgress
+			.Concat(PerseveranceProgress)
+			.Concat(ThoughtfulnessProgress)
+			.Concat(MemoryProgress)
+			.Concat(AdaptabilityProgress)
+			.Concat(ActivityProgress)
+			.ToArray();
 	}
 }

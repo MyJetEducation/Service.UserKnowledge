@@ -10,7 +10,7 @@ namespace Service.UserProgress.Mapper
 		{
 			Progress = dto.Progress,
 			Index = (int) dto.Tutorial,
-			Count = dto.TaskCount
+			Count = dto.TaskProgress.Count
 		};
 
 		public static AllProgressGrpcResponse ToGrpcModel(this ProgressDto[] dtos) => new AllProgressGrpcResponse

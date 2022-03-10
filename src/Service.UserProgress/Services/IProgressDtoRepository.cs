@@ -11,6 +11,6 @@ namespace Service.UserProgress.Services
 
 		ValueTask<ProgressDto[]> GetDataAll(Guid? userId);
 
-		ValueTask SetData(Guid? userId, EducationTutorial tutorial, int unit, int task);
+		ValueTask SetData(Guid? userId, EducationTutorial tutorial, int unit, int task, int progress);
 	}
 }

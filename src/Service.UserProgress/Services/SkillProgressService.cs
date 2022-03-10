@@ -38,7 +38,7 @@ namespace Service.UserProgress.Services
 				: JsonSerializer.Deserialize<SkillProgressDto>(value);
 		}
 
-		public async ValueTask SetData(Guid? userId, EducationTutorial tutorial, int unit, int task)
+		public async ValueTask SetData(Guid? userId, EducationTutorial tutorial, int unit, int task, int progress)
 		{
 			EducationStructureTask structureTask = EducationHelper.GetTask(tutorial, unit, task);
 			if (structureTask == null)
@@ -52,22 +52,22 @@ namespace Service.UserProgress.Services
 			switch (structureTask.TaskType)
 			{
 				case EducationTaskType.Text:
-					dto.ConcentrationCount++;
+					dto.ConcentrationProgress.Add(progress);
 					break;
 				case EducationTaskType.Video:
-					dto.PerseveranceCount++;
+					dto.PerseveranceProgress.Add(progress);
 					break;
 				case EducationTaskType.Case:
-					dto.ThoughtfulnessCount++;
+					dto.ThoughtfulnessProgress.Add(progress);
 					break;
 				case EducationTaskType.Test:
-					dto.MemoryCount++;
+					dto.MemoryProgress.Add(progress);
 					break;
 				case EducationTaskType.TrueFalse:
-					dto.AdaptabilityCount++;
+					dto.AdaptabilityProgress.Add(progress);
 					break;
 				case EducationTaskType.Game:
-					dto.ActivityCount++;
+					dto.ActivityProgress.Add(progress);
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();

@@ -9,6 +9,6 @@ namespace Service.UserProgress.Services
 	{
 		ValueTask<SkillProgressDto> GetData(Guid? userId);
 
-		ValueTask SetData(Guid? userId, EducationTutorial tutorial, int unit, int task);
+		ValueTask SetData(Guid? userId, EducationTutorial tutorial, int unit, int task, int progress);
 	}
 }

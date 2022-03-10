@@ -31,17 +31,21 @@ namespace Service.UserProgress.Jobs
 		{
 			foreach (SetProgressInfoServiceBusModel message in events)
 			{
+				if (!message.SetUserProgress)
+					continue;
+
 				Guid? userId = message.UserId;
 				_logger.LogInformation("SetProgressInfoServiceBusModel handled from service bus: {user}", userId);
 
 				EducationTutorial tutorial = message.Tutorial;
 				int unit = message.Unit;
 				int task = message.Task;
+				int progress = message.Progress;
 
 				foreach (IProgressDtoRepository repository in _dtoRepositories)
-					await repository.SetData(userId, tutorial, unit, task);
+					await repository.SetData(userId, tutorial, unit, task, progress);
 
-				await _skillProgressService.SetData(userId, tutorial, unit, task);
+				await _skillProgressService.SetData(userId, tutorial, unit, task, progress);
 			}
 		}
 	}

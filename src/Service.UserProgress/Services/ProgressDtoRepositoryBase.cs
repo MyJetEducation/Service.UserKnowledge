@@ -37,14 +37,7 @@ namespace Service.UserProgress.Services
 				.OrderByDescending(dto => dto.Tutorial)
 				.FirstOrDefault();
 
-			return progressDto == null
-				? new ProgressDto()
-				: new ProgressDto
-				{
-					Progress = progressDto.Progress,
-					Tutorial = progressDto.Tutorial,
-					TaskCount = dtos.Sum(dto => dto.TaskCount)
-				};
+			return progressDto ?? new ProgressDto(EducationTutorial.PersonalFinance);
 		}
 
 		public async ValueTask<ProgressDto[]> GetDataAll(Guid? userId)
@@ -60,7 +53,7 @@ namespace Service.UserProgress.Services
 				: JsonSerializer.Deserialize<ProgressDto[]>(value);
 		}
 
-		public async ValueTask SetData(Guid? userId, EducationTutorial tutorial, int unit, int task)
+		public async ValueTask SetData(Guid? userId, EducationTutorial tutorial, int unit, int task, int progress)
 		{
 			EducationStructureTask structureTask = EducationHelper.GetTask(tutorial, unit, task);
 			if (!AllowedTaskTypes.Contains(structureTask.TaskType))
@@ -71,11 +64,11 @@ namespace Service.UserProgress.Services
 			ProgressDto progressDto = dtos.FirstOrDefault(dto => dto.Tutorial == tutorial);
 			if (progressDto == null)
 			{
-				progressDto = new ProgressDto {Tutorial = tutorial};
+				progressDto = new ProgressDto(tutorial);
 				dtos.Add(progressDto);
 			}
 
-			progressDto.TaskCount++;
+			progressDto.TaskProgress.Add(progress);
 			CountProgress(progressDto);
 
 			CommonGrpcResponse response = await SetData(userId, dtos.ToArray());
@@ -109,7 +102,7 @@ namespace Service.UserProgress.Services
 				.SelectMany(pair => pair.Value.Tasks)
 				.Count(task => AllowedTaskTypes.Contains(task.Value.TaskType));
 
-			dto.Progress = (int) Math.Round(dto.TaskCount * 100 / (float) totalCount);
+			dto.Progress = dto.TaskProgress.Sum() / totalCount;
 		}
 	}
 }
