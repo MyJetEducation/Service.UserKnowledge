@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.ServiceBus;
-using Service.Education.Constants;
+using Service.Education.Extensions;
 using Service.Education.Structure;
 using Service.Grpc;
 using Service.ServerKeyValue.Grpc;
@@ -27,7 +27,7 @@ namespace Service.UserProgress.Services
 		protected override async ValueTask ProgressSaved(Guid? userId, IEnumerable<ProgressDto> progressDtos) => await _publisher.PublishAsync(new UserProgressUpdatedServiceBusModel
 		{
 			UserId = userId,
-			HabitCount = progressDtos.Count(dto => dto.Progress >= Progress.MaxProgress)
+			HabitCount = progressDtos.Count(dto => dto.Progress.IsOkProgress())
 		});
 	}
 }

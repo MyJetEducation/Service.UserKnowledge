@@ -6,12 +6,17 @@ namespace Service.UserProgress.Mapper
 {
 	public static class ProgressMapper
 	{
-		public static ProgressGrpcResponse ToGrpcModel(this ProgressDto dto) => new ProgressGrpcResponse
+		public static ProgressGrpcResponse ToGrpcModel(this ProgressDto dto)
 		{
-			Progress = dto.Progress,
-			Index = (int) dto.Tutorial,
-			Count = dto.TaskProgress.Count
-		};
+			return dto.TaskProgress.Any()
+				? new ProgressGrpcResponse
+				{
+					Progress = dto.Progress,
+					Index = (int) dto.Tutorial,
+					Count = dto.TaskProgress.Count
+				}
+				: new ProgressGrpcResponse();
+		}
 
 		public static AllProgressGrpcResponse ToGrpcModel(this ProgressDto[] dtos) => new AllProgressGrpcResponse
 		{
