@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotNetCoreDecorators;
@@ -34,7 +33,7 @@ namespace Service.UserProgress.Jobs
 				if (!message.SetUserProgress)
 					continue;
 
-				Guid? userId = message.UserId;
+				string userId = message.UserId;
 				_logger.LogInformation("SetProgressInfoServiceBusModel handled from service bus: {user}", userId);
 
 				EducationTutorial tutorial = message.Tutorial;

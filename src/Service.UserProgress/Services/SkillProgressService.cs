@@ -25,7 +25,7 @@ namespace Service.UserProgress.Services
 			_logger = logger;
 		}
 
-		public async ValueTask<SkillProgressDto> GetData(Guid? userId)
+		public async ValueTask<SkillProgressDto> GetData(string userId)
 		{
 			string value = (await _serverKeyValueService.Service.GetSingle(new ItemsGetSingleGrpcRequest
 			{
@@ -38,7 +38,7 @@ namespace Service.UserProgress.Services
 				: JsonSerializer.Deserialize<SkillProgressDto>(value);
 		}
 
-		public async ValueTask SetData(Guid? userId, EducationTutorial tutorial, int unit, int task, int progress)
+		public async ValueTask SetData(string userId, EducationTutorial tutorial, int unit, int task, int progress)
 		{
 			EducationStructureTask structureTask = EducationHelper.GetTask(tutorial, unit, task);
 			if (structureTask == null)
@@ -78,7 +78,7 @@ namespace Service.UserProgress.Services
 				_logger.LogError("Error while save skill user progress for user: {user}, dto: {dto}.", userId, dto);
 		}
 
-		private async ValueTask<CommonGrpcResponse> SetData(Guid? userId, SkillProgressDto dto) => await _serverKeyValueService.TryCall(service => service.Put(new ItemsPutGrpcRequest
+		private async ValueTask<CommonGrpcResponse> SetData(string userId, SkillProgressDto dto) => await _serverKeyValueService.TryCall(service => service.Put(new ItemsPutGrpcRequest
 		{
 			UserId = userId,
 			Items = new[]

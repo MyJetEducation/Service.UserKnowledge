@@ -24,7 +24,7 @@ namespace Service.UserProgress.Services
 		protected override EducationTaskType[] AllowedTaskTypes => new[] {EducationTaskType.Test, EducationTaskType.Game};
 
 		//Publish for UserReward serice
-		protected override async ValueTask ProgressSaved(Guid? userId, IEnumerable<ProgressDto> progressDtos) => await _publisher.PublishAsync(new UserProgressUpdatedServiceBusModel
+		protected override async ValueTask ProgressSaved(string userId, IEnumerable<ProgressDto> progressDtos) => await _publisher.PublishAsync(new UserProgressUpdatedServiceBusModel
 		{
 			UserId = userId,
 			HabitCount = progressDtos.Count(dto => dto.Progress.IsOkProgress())
