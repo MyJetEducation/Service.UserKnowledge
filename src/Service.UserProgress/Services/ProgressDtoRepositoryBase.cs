@@ -29,7 +29,7 @@ namespace Service.UserProgress.Services
 
 		protected abstract EducationTaskType[] AllowedTaskTypes { get; }
 
-		public async ValueTask<ProgressDto> GetData(Guid? userId)
+		public async ValueTask<ProgressDto> GetData(string userId)
 		{
 			ProgressDto[] dtos = await GetDataAll(userId);
 
@@ -40,7 +40,7 @@ namespace Service.UserProgress.Services
 			return progressDto ?? new ProgressDto(EducationTutorial.PersonalFinance);
 		}
 
-		public async ValueTask<ProgressDto[]> GetDataAll(Guid? userId)
+		public async ValueTask<ProgressDto[]> GetDataAll(string userId)
 		{
 			string value = (await _serverKeyValueService.Service.GetSingle(new ItemsGetSingleGrpcRequest
 			{
@@ -53,7 +53,7 @@ namespace Service.UserProgress.Services
 				: JsonSerializer.Deserialize<ProgressDto[]>(value);
 		}
 
-		public async ValueTask SetData(Guid? userId, EducationTutorial tutorial, int unit, int task, int progress)
+		public async ValueTask SetData(string userId, EducationTutorial tutorial, int unit, int task, int progress)
 		{
 			EducationStructureTask structureTask = EducationHelper.GetTask(tutorial, unit, task);
 			if (!AllowedTaskTypes.Contains(structureTask.TaskType))
@@ -81,9 +81,9 @@ namespace Service.UserProgress.Services
 			await ProgressSaved(userId, dtos);
 		}
 
-		protected virtual ValueTask ProgressSaved(Guid? userId, IEnumerable<ProgressDto> progressDtos) => ValueTask.CompletedTask;
+		protected virtual ValueTask ProgressSaved(string userId, IEnumerable<ProgressDto> progressDtos) => ValueTask.CompletedTask;
 
-		private async ValueTask<CommonGrpcResponse> SetData(Guid? userId, ProgressDto[] dtos) => await _serverKeyValueService.TryCall(service => service.Put(new ItemsPutGrpcRequest
+		private async ValueTask<CommonGrpcResponse> SetData(string userId, ProgressDto[] dtos) => await _serverKeyValueService.TryCall(service => service.Put(new ItemsPutGrpcRequest
 		{
 			UserId = userId,
 			Items = new[]
