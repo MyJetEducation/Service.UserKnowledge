@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MyJetEducation.Service.ServiceBus" Version="1.0.28" />
+    <PackageReference Include="MyJetEducation.Service.ServiceBus" Version="1.0.29" />
     <PackageReference PrivateAssets="All" Include="MyJetWallet.Sdk.Grpc" Version="2.0.0" />
   </ItemGroup>
 
